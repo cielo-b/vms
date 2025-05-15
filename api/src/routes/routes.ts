@@ -60,6 +60,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateParkingSpotDto": {
+        "dataType": "refObject",
+        "properties": {
+            "spotNumber": {"dataType":"string"},
+            "isOccupied": {"dataType":"boolean"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateParkingDto": {
         "dataType": "refObject",
         "properties": {
@@ -281,6 +290,161 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'createParkingSpot',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParkingSpotController_getAllSpotsGroupedByParking: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/parking/spots',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController)),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController.prototype.getAllSpotsGroupedByParking)),
+
+            async function ParkingSpotController_getAllSpotsGroupedByParking(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParkingSpotController_getAllSpotsGroupedByParking, request, response });
+
+                const controller = new ParkingSpotController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllSpotsGroupedByParking',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParkingSpotController_getSpotsByParkingId: Record<string, TsoaRoute.ParameterSchema> = {
+                parkingId: {"in":"path","name":"parkingId","required":true,"dataType":"string"},
+        };
+        app.get('/parking/:parkingId/spots',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController)),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController.prototype.getSpotsByParkingId)),
+
+            async function ParkingSpotController_getSpotsByParkingId(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParkingSpotController_getSpotsByParkingId, request, response });
+
+                const controller = new ParkingSpotController();
+
+              await templateService.apiHandler({
+                methodName: 'getSpotsByParkingId',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParkingSpotController_getSpotById: Record<string, TsoaRoute.ParameterSchema> = {
+                spotId: {"in":"path","name":"spotId","required":true,"dataType":"string"},
+        };
+        app.get('/parking/spots/:spotId',
+            authenticateMiddleware([{"bearerAuth":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController)),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController.prototype.getSpotById)),
+
+            async function ParkingSpotController_getSpotById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParkingSpotController_getSpotById, request, response });
+
+                const controller = new ParkingSpotController();
+
+              await templateService.apiHandler({
+                methodName: 'getSpotById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParkingSpotController_updateSpot: Record<string, TsoaRoute.ParameterSchema> = {
+                spotId: {"in":"path","name":"spotId","required":true,"dataType":"string"},
+                dto: {"in":"body","name":"dto","required":true,"ref":"UpdateParkingSpotDto"},
+        };
+        app.put('/parking/spots/:spotId',
+            authenticateMiddleware([{"bearerAuth":["ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController)),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController.prototype.updateSpot)),
+
+            async function ParkingSpotController_updateSpot(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParkingSpotController_updateSpot, request, response });
+
+                const controller = new ParkingSpotController();
+
+              await templateService.apiHandler({
+                methodName: 'updateSpot',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsParkingSpotController_deleteSpot: Record<string, TsoaRoute.ParameterSchema> = {
+                spotId: {"in":"path","name":"spotId","required":true,"dataType":"string"},
+        };
+        app.delete('/parking/spots/:spotId',
+            authenticateMiddleware([{"bearerAuth":["ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController)),
+            ...(fetchMiddlewares<RequestHandler>(ParkingSpotController.prototype.deleteSpot)),
+
+            async function ParkingSpotController_deleteSpot(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsParkingSpotController_deleteSpot, request, response });
+
+                const controller = new ParkingSpotController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteSpot',
                 controller,
                 response,
                 next,
