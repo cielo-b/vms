@@ -30,4 +30,10 @@ export class Utility {
   static async hash(raw: string): Promise<string> {
     return await bcrypt.hash(raw, 10);
   }
+
+  public static generateSpotNumber(position: number): string {
+    const section = String.fromCharCode(65 + Math.floor(position / 100));
+    const spotNum = (position % 100).toString().padStart(2, "0");
+    return `${section}-${spotNum}`;
+  }
 }

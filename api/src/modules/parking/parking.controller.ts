@@ -18,9 +18,11 @@ export class ParkingController extends Controller {
   private parkingService: ParkingService = new ParkingService();
 
   @Post("/create")
-  @Security("bearerAuth", ['ADMIN'])
+  @Security("bearerAuth", ["ADMIN"])
   @Response<ApiResponse>("201", "Parking created successfully.")
   @Response<ApiResponse>("400", "Bad Request")
+  @Response<ApiResponse>("401", "Unauthorized")
+  @Response<ApiResponse>("403", "Forbidden - Admin access required")
   public async createParking(
     @Body() dto: CreateParkingDto,
     @Request() req: Express.Request

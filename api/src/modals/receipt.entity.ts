@@ -13,8 +13,8 @@ import { EPaymentMethod } from "../enums/payment-method.enum";
 
 @Entity()
 export class Receipt {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
   @Column({ unique: true })
   receiptNumber!: string;

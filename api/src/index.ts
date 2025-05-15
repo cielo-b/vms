@@ -8,7 +8,10 @@ import swaggerUI from "swagger-ui-express";
 import { errorHandler } from "./middlewares/error.middleware";
 import { RegisterRoutes } from "./routes/routes";
 import { adminGuard } from "./guards/index.guard";
-import { expressAuth, expressAuthentication } from "./middlewares/auth.middleware";
+import {
+  expressAuth,
+  expressAuthentication,
+} from "./middlewares/auth.middleware";
 
 dotenv.config();
 const app = express();
@@ -37,6 +40,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use("/parking/create", expressAuth, adminGuard);
+app.use("/parking/:parkingId/spots/create", expressAuth, adminGuard);
 
 RegisterRoutes(app);
 

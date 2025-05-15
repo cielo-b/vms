@@ -11,8 +11,8 @@ import { Audit } from "../audits/Audit";
 
 @Entity("parking_spot")
 export class ParkingSpot extends Audit {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
   @Column()
   spotNumber!: string;

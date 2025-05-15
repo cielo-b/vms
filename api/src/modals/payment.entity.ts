@@ -6,8 +6,8 @@ import { Receipt } from "./receipt.entity";
 
 @Entity()
 export class Payment extends Audit {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
   @Column()
   amount!: number;
