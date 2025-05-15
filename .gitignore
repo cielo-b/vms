@@ -1,0 +1,8 @@
+/api/.qodo
+/api/node_modules/
+/api/.env
+/api/.env.*
+/api/dist/
+/client/.qodo
+/client/.env
+/client/node_modules
