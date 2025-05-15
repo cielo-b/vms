@@ -5,7 +5,7 @@
   "spec": {
     "outputDirectory": "src/swagger",
     "specVersion": 3,
-    "basePath": "/api",
+    "basePath": "/",
     "securityDefinitions": {
       "bearerAuth": {
         "type": "http",
@@ -15,6 +15,7 @@
     }
   },
   "routes": {
-    "routesDir": "src/routes"
+    "routesDir": "src/routes",
+    "authenticationModule": "./src/middlewares/auth.middleware.ts"
   }
 }

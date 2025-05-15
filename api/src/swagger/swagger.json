@@ -68,6 +68,27 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CreateParkingDto": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"price": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"name",
+					"address",
+					"price"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LoginDto": {
 				"properties": {
 					"email": {
@@ -156,6 +177,64 @@
 				}
 			}
 		},
+		"/parking/create": {
+			"post": {
+				"operationId": "CreateParking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Parking created successfully.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Parking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateParkingDto"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/auth/login": {
 			"post": {
 				"operationId": "Login",
@@ -201,7 +280,7 @@
 	},
 	"servers": [
 		{
-			"url": "/api"
+			"url": "/"
 		}
 	]
 }

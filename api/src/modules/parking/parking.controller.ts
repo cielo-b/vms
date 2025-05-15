@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Response, Route, Tags } from "tsoa";
+import {
+  Body,
+  Controller,
+  Post,
+  Request,
+  Response,
+  Route,
+  Security,
+  Tags,
+} from "tsoa";
 import { ParkingService } from "./parking.service";
 import { ApiResponse } from "../../interfaces/api-response.interface";
 import { CreateParkingDto } from "./dto/create-parking.dto";
@@ -9,10 +18,12 @@ export class ParkingController extends Controller {
   private parkingService: ParkingService = new ParkingService();
 
   @Post("/create")
+  @Security("bearerAuth", ['ADMIN'])
   @Response<ApiResponse>("201", "Parking created successfully.")
   @Response<ApiResponse>("400", "Bad Request")
   public async createParking(
-    @Body() dto: CreateParkingDto
+    @Body() dto: CreateParkingDto,
+    @Request() req: Express.Request
   ): Promise<ApiResponse> {
     const response = await this.parkingService.createParking(dto);
     this.setStatus(response.code);
