@@ -60,6 +60,12 @@ app.use("/booking/:id/start-parking", expressAuth, customerGuard);
 app.use("/booking/:id/complete-parking", expressAuth, customerGuard);
 app.use("/booking/create", expressAuth, customerGuard);
 
+app.use("/payment/process/:bookingId", expressAuth, adminGuard);
+app.use("/payment/booking/:bookingId", expressAuth);
+
+app.use("/receipt/:id", expressAuth);
+app.use("/receipt/my-receipts", expressAuth, customerGuard);
+
 RegisterRoutes(app);
 
 app.use(errorHandler);
