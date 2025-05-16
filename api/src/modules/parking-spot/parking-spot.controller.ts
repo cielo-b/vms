@@ -99,4 +99,55 @@ export class ParkingSpotController extends Controller {
     this.setStatus(200);
     return response;
   }
+
+  @Post("/:spotId/start-direct-parking")
+  @Security("bearerAuth", ["CUSTOMER"])
+  @Response<ApiResponse>("201", "Direct parking started successfully")
+  @Response<ApiResponse>("400", "Bad Request - Spot occupied or invalid data")
+  @Response<ApiResponse>("401", "Unauthorized")
+  @Response<ApiResponse>("404", "Spot, customer or vehicle not found")
+  public async startDirectParking(
+    spotId: string,
+    @Body() body: { vehicleId: string },
+    @Request() req: Express.Request
+  ): Promise<ApiResponse> {
+    const customerId = (req as any).user.id;
+    const response = await this.parkingSpotService.startDirectParking(
+      spotId,
+      customerId,
+      body.vehicleId
+    );
+    this.setStatus(response.code);
+    return response;
+  }
+
+  @Post("/:spotId/complete-direct-parking")
+  @Security("bearerAuth", ["CUSTOMER"])
+  @Response<ApiResponse>("200", "Direct parking completed successfully")
+  @Response<ApiResponse>("400", "Bad Request - No active session")
+  @Response<ApiResponse>("401", "Unauthorized")
+  @Response<ApiResponse>("404", "Spot not found")
+  public async completeDirectParking(
+    spotId: string,
+    @Body() body: { hoursParked: number }
+  ): Promise<ApiResponse> {
+    const response = await this.parkingSpotService.completeDirectParking(
+      spotId,
+      body.hoursParked
+    );
+    this.setStatus(response.code);
+    return response;
+  }
+
+  @Get("/:spotId/active-session")
+  @Security("bearerAuth", ["ADMIN", "CUSTOMER"])
+  @Response<ApiResponse>("200", "Active parking session details")
+  @Response<ApiResponse>("404", "No active session found")
+  public async getActiveParkingSession(spotId: string): Promise<ApiResponse> {
+    const response = await this.parkingSpotService.getActiveParkingSession(
+      spotId
+    );
+    this.setStatus(response.code);
+    return response;
+  }
 }

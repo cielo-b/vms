@@ -132,6 +132,60 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"CreateBookingDto": {
+				"properties": {
+					"startTime": {
+						"type": "string"
+					},
+					"requestedHours": {
+						"type": "number",
+						"format": "double"
+					},
+					"customerId": {
+						"type": "string"
+					},
+					"vehicleId": {
+						"type": "string"
+					},
+					"spotId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"startTime",
+					"requestedHours",
+					"customerId",
+					"vehicleId",
+					"spotId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EBookingStatus": {
+				"enum": [
+					"PENDING",
+					"APPROVED",
+					"ACTIVE",
+					"COMPLETED",
+					"CANCELLED"
+				],
+				"type": "string"
+			},
+			"UpdateBookingDto": {
+				"properties": {
+					"endTime": {
+						"type": "string"
+					},
+					"status": {
+						"$ref": "#/components/schemas/EBookingStatus"
+					},
+					"startTime": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"LoginDto": {
 				"properties": {
 					"email": {
@@ -884,6 +938,235 @@
 				]
 			}
 		},
+		"/parking/{spotId}/start-direct-parking": {
+			"post": {
+				"operationId": "StartDirectParking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Direct parking started successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Spot occupied or invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Spot, customer or vehicle not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Parking Spots"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "spotId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"vehicleId": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"vehicleId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/parking/{spotId}/complete-direct-parking": {
+			"post": {
+				"operationId": "CompleteDirectParking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - No active session",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Spot not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Parking Spots"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "spotId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"hoursParked": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"hoursParked"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/parking/{spotId}/active-session": {
+			"get": {
+				"operationId": "GetActiveParkingSession",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "No active session found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Parking Spots"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN",
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "spotId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/parking/create": {
 			"post": {
 				"operationId": "CreateParking",
@@ -1168,6 +1451,503 @@
 					{
 						"bearerAuth": [
 							"ADMIN"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/booking/create": {
+			"post": {
+				"operationId": "CreateBooking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Booking created successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request - Spot not available or invalid data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Customer access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateBookingDto"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/booking": {
+			"get": {
+				"operationId": "GetAllBookings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Admin access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/booking/{id}": {
+			"get": {
+				"operationId": "GetBookingById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Owner or admin access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Booking not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateBooking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request - Invalid status transition",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Owner or admin access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Booking not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN",
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateBookingDto"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteBooking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Owner or admin access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Booking not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN",
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/booking/{id}/start-parking": {
+			"post": {
+				"operationId": "StartParking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request - Invalid booking status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Owner access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Booking not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/booking/{id}/complete-parking": {
+			"post": {
+				"operationId": "CompleteParking",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request - Invalid booking status",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Owner access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Booking not found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
 						]
 					}
 				],

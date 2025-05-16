@@ -6,6 +6,10 @@ import { ApiError } from "../../errors/api-error";
 import { Parking } from "../../modals/parking.entity";
 import { Utility } from "../../utils/Utility";
 import { UpdateParkingSpotDto } from "./dto/update-parking-spot.dto";
+import { EBookingStatus } from "../../enums/booking-status.enum";
+import { User } from "../../modals/user.entity";
+import { Vehicle } from "../../modals/vehicle.entity";
+import { Booking } from "../../modals/booking.entity";
 
 export class ParkingSpotService {
   public async createParkingSpot(id: string): Promise<ApiResponse> {
@@ -193,6 +197,162 @@ export class ParkingSpotService {
       };
     } catch (error) {
       console.error("Error deleting parking spot:", error);
+      throw error instanceof ApiError ? error : ApiError.internal();
+    }
+  }
+
+  public async startDirectParking(
+    spotId: string,
+    customerId: string,
+    vehicleId: string
+  ): Promise<ApiResponse> {
+    const parkingSpotRepo: Repository<ParkingSpot> =
+      AppDataSource.getRepository(ParkingSpot);
+
+
+    const bookingRepo: Repository<Booking> =
+      AppDataSource.getRepository(Booking);
+
+    const vehicleRepo: Repository<Vehicle> =
+      AppDataSource.getRepository(Vehicle);
+
+    const userRepo: Repository<User> = AppDataSource.getRepository(User);
+    try {
+      // Validate entities exist
+      const [spot, customer, vehicle] = await Promise.all([
+        parkingSpotRepo.findOne({ where: { id: spotId } }),
+        userRepo.findOne({ where: { id: customerId } }),
+        vehicleRepo.findOne({ where: { id: vehicleId } }),
+      ]);
+
+      if (!spot) throw ApiError.notFound("Parking spot not found");
+      if (!customer) throw ApiError.notFound("Customer not found");
+      if (!vehicle) throw ApiError.notFound("Vehicle not found");
+
+      // Check spot availability
+      if (spot.isOccupied) {
+        throw ApiError.badRequest("This parking spot is already occupied");
+      }
+
+      // Create immediate booking record
+      const booking = bookingRepo.create({
+        startTime: new Date(),
+        status: EBookingStatus.ACTIVE,
+        customer,
+        vehicle,
+        parkingSpot: spot,
+      });
+
+      await bookingRepo.save(booking);
+
+      // Update spot status
+      spot.isOccupied = true;
+      await parkingSpotRepo.save(spot);
+
+      return {
+        success: true,
+        message: "Direct parking started successfully",
+        data: booking,
+        code: 201,
+      };
+    } catch (error) {
+      console.error("Error starting direct parking:", error);
+      throw error instanceof ApiError ? error : ApiError.internal();
+    }
+  }
+
+  public async completeDirectParking(
+    spotId: string,
+    hoursParked: number
+  ): Promise<ApiResponse> {
+    const parkingSpotRepo: Repository<ParkingSpot> =
+      AppDataSource.getRepository(ParkingSpot);
+
+
+    const bookingRepo: Repository<Booking> =
+      AppDataSource.getRepository(Booking);
+
+
+    try {
+      const spot = await parkingSpotRepo.findOne({
+        where: { id: spotId },
+        relations: ["parkingLot"],
+      });
+
+      if (!spot) throw ApiError.notFound("Parking spot not found");
+
+      // Find active booking for this spot
+      const booking = await bookingRepo.findOne({
+        where: {
+          parkingSpot: { id: spotId },
+          status: EBookingStatus.ACTIVE,
+        },
+        relations: ["customer", "vehicle", "parkingSpot"],
+      });
+
+      if (!booking) {
+        throw ApiError.badRequest(
+          "No active parking session found for this spot"
+        );
+      }
+
+      // Calculate payment
+      const totalAmount = hoursParked * spot.parkingLot.pricePerHour;
+
+      // Update booking
+      booking.endTime = new Date();
+      booking.status = EBookingStatus.COMPLETED;
+      await bookingRepo.save(booking);
+
+      // Free up the spot
+      spot.isOccupied = false;
+      await parkingSpotRepo.save(spot);
+
+      return {
+        success: true,
+        message: "Direct parking completed successfully",
+        data: {
+          booking,
+          hoursParked,
+          totalAmount,
+          currency: "USD", // Adjust as needed
+        },
+        code: 200,
+      };
+    } catch (error) {
+      console.error("Error completing direct parking:", error);
+      throw error instanceof ApiError ? error : ApiError.internal();
+    }
+  }
+
+  public async getActiveParkingSession(spotId: string): Promise<ApiResponse> {
+
+
+    const bookingRepo: Repository<Booking> =
+      AppDataSource.getRepository(Booking);
+
+
+    try {
+      const booking = await bookingRepo.findOne({
+        where: {
+          parkingSpot: { id: spotId },
+          status: EBookingStatus.ACTIVE,
+        },
+        relations: ["customer", "vehicle"],
+      });
+
+      if (!booking) {
+        throw ApiError.notFound("No active parking session found");
+      }
+
+      return {
+        success: true,
+        message: "Active parking session retrieved",
+        data: booking,
+        code: 200,
+      };
+    } catch (error) {
+      console.error("Error getting active parking session:", error);
       throw error instanceof ApiError ? error : ApiError.internal();
     }
   }
