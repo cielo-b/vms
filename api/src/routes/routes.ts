@@ -45,7 +45,7 @@ const models: TsoaRoute.Models = {
     "CreateVehicleDto": {
         "dataType": "refObject",
         "properties": {
-            "licensePlate": {"dataType":"string","required":true},
+            "plateNumber": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -53,7 +53,7 @@ const models: TsoaRoute.Models = {
     "UpdateVehicleDto": {
         "dataType": "refObject",
         "properties": {
-            "licensePlate": {"dataType":"string"},
+            "plateNumber": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -518,7 +518,7 @@ export function RegisterRoutes(app: Router) {
         const argsReceiptController_getReceiptById: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/receipt/:id',
+        app.get('/receipt/by-id/:id',
             authenticateMiddleware([{"bearerAuth":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ReceiptController)),
             ...(fetchMiddlewares<RequestHandler>(ReceiptController.prototype.getReceiptById)),
@@ -566,6 +566,37 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getMyReceipts',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsReceiptController_getAllReceipts: Record<string, TsoaRoute.ParameterSchema> = {
+                req: {"in":"request","name":"req","required":true,"dataType":"object"},
+        };
+        app.get('/receipt',
+            authenticateMiddleware([{"bearerAuth":["ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(ReceiptController)),
+            ...(fetchMiddlewares<RequestHandler>(ReceiptController.prototype.getAllReceipts)),
+
+            async function ReceiptController_getAllReceipts(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsReceiptController_getAllReceipts, request, response });
+
+                const controller = new ReceiptController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllReceipts',
                 controller,
                 response,
                 next,
@@ -1141,10 +1172,41 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsBookingController_getMyBookings: Record<string, TsoaRoute.ParameterSchema> = {
+                req: {"in":"request","name":"req","required":true,"dataType":"object"},
+        };
+        app.get('/booking/mine',
+            authenticateMiddleware([{"bearerAuth":["CUSTOMER"]}]),
+            ...(fetchMiddlewares<RequestHandler>(BookingController)),
+            ...(fetchMiddlewares<RequestHandler>(BookingController.prototype.getMyBookings)),
+
+            async function BookingController_getMyBookings(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsBookingController_getMyBookings, request, response });
+
+                const controller = new BookingController();
+
+              await templateService.apiHandler({
+                methodName: 'getMyBookings',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsBookingController_getBookingById: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"string"},
         };
-        app.get('/booking/:id',
+        app.get('/booking/by-id/:id',
             authenticateMiddleware([{"bearerAuth":[]}]),
             ...(fetchMiddlewares<RequestHandler>(BookingController)),
             ...(fetchMiddlewares<RequestHandler>(BookingController.prototype.getBookingById)),

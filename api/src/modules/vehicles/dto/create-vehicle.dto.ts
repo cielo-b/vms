@@ -1,3 +1,3 @@
 export class CreateVehicleDto {
-  licensePlate!: string;
+  plateNumber!: string;
 }

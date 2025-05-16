@@ -14,7 +14,7 @@ import {
 import { VehicleService } from "./vehicle.service";
 import { ApiResponse } from "../../interfaces/api-response.interface";
 import { CreateVehicleDto } from "./dto/create-vehicle.dto";
-import { UpdateVehicleDto } from "./update-vehicle.dto";
+import { UpdateVehicleDto } from "./dto/update-vehicle.dto";
 
 @Route("vehicle")
 @Tags("Vehicle")

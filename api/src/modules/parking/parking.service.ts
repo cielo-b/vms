@@ -5,6 +5,7 @@ import { Parking } from "../../modals/parking.entity";
 import { AppDataSource } from "../../config/data-source";
 import { ApiError } from "../../errors/api-error";
 import { UpdateParkingDto } from "./dto/update-parking.dto";
+import { ParkingSpot } from "../../modals/parking-spot.entity";
 
 export class ParkingService {
   public async createParking(dto: CreateParkingDto): Promise<ApiResponse> {
@@ -32,7 +33,10 @@ export class ParkingService {
       return {
         success: true,
         message: "Parking created successfully.",
-        data: parking,
+        data: await parkingRepo.findOne({
+          where: { name: parking.name },
+          relations: ["spots"],
+        }),
         code: 201,
       };
     } catch (error) {
@@ -46,7 +50,7 @@ export class ParkingService {
       AppDataSource.getRepository(Parking);
 
     try {
-      const parkings = await parkingRepo.find();
+      const parkings = await parkingRepo.find({ relations: ["spots"] });
       return {
         success: true,
         message: "Parkings retrieved successfully.",
@@ -115,7 +119,10 @@ export class ParkingService {
       return {
         success: true,
         message: "Parking updated successfully.",
-        data: parking,
+        data: await parkingRepo.findOne({
+          where: { name: parking.name },
+          relations: ["spots"],
+        }),
         code: 201,
       };
     } catch (error) {
@@ -129,15 +136,30 @@ export class ParkingService {
       AppDataSource.getRepository(Parking);
 
     try {
-      const result = await parkingRepo.delete(id);
+      // Find the parking with its spots
+      const parking = await parkingRepo.findOne({
+        where: { id },
+        relations: ["spots"],
+      });
 
-      if (result.affected === 0) {
+      if (!parking) {
         throw ApiError.notFound(`Parking with ID ${id} not found.`);
       }
 
+      // Delete all referencing spots first (if any)
+      if (parking.spots && parking.spots.length > 0) {
+        const spotRepo = AppDataSource.getRepository(ParkingSpot);
+        parking.spots.map((spot) => {
+          spotRepo.delete(spot.id);
+        })
+      }
+
+      // Now delete the parking itself
+      await parkingRepo.delete(id);
+
       return {
         success: true,
-        message: "Parking deleted successfully.",
+        message: "Parking and related records deleted successfully.",
         code: 200,
       };
     } catch (error) {

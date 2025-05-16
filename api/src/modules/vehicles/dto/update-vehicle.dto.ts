@@ -1,3 +1,3 @@
 export class UpdateVehicleDto {
-  licensePlate?: string;
+  plateNumber?: string;
 }

@@ -11,10 +11,13 @@ import { CreateBookingDto } from "./dto/create-booking.dto";
 import { UpdateBookingDto } from "./dto/update-booking.dto";
 
 export class BookingService {
-  private bookingRepo: Repository<Booking> = AppDataSource.getRepository(Booking);
+  private bookingRepo: Repository<Booking> =
+    AppDataSource.getRepository(Booking);
   private userRepo: Repository<User> = AppDataSource.getRepository(User);
-  private vehicleRepo: Repository<Vehicle> = AppDataSource.getRepository(Vehicle);
-  private spotRepo: Repository<ParkingSpot> = AppDataSource.getRepository(ParkingSpot);
+  private vehicleRepo: Repository<Vehicle> =
+    AppDataSource.getRepository(Vehicle);
+  private spotRepo: Repository<ParkingSpot> =
+    AppDataSource.getRepository(ParkingSpot);
 
   public async createBooking(dto: CreateBookingDto): Promise<ApiResponse> {
     try {
@@ -64,7 +67,25 @@ export class BookingService {
   public async getAllBookings(): Promise<ApiResponse> {
     try {
       const bookings = await this.bookingRepo.find({
-        relations: ['customer', 'vehicle', 'parkingSpot'],
+        relations: ["customer", "vehicle", "parkingSpot"],
+      });
+      return {
+        success: true,
+        message: "Bookings retrieved successfully",
+        data: bookings,
+        code: 200,
+      };
+    } catch (error) {
+      console.error("Error getting all bookings:", error);
+      throw ApiError.internal();
+    }
+  }
+
+  public async getMyBookings(req: any): Promise<ApiResponse> {
+    try {
+      const bookings = await this.bookingRepo.find({
+        where: { customer: { id: req.user.id } },
+        relations: ["customer", "vehicle", "parkingSpot"],
       });
       return {
         success: true,
@@ -82,7 +103,7 @@ export class BookingService {
     try {
       const booking = await this.bookingRepo.findOne({
         where: { id },
-        relations: ['customer', 'vehicle', 'parkingSpot', 'payment', 'receipt'],
+        relations: ["customer", "vehicle", "parkingSpot", "payment", "receipt"],
       });
 
       if (!booking) {
@@ -101,11 +122,14 @@ export class BookingService {
     }
   }
 
-  public async updateBooking(id: string, dto: UpdateBookingDto): Promise<ApiResponse> {
+  public async updateBooking(
+    id: string,
+    dto: UpdateBookingDto
+  ): Promise<ApiResponse> {
     try {
-      const booking = await this.bookingRepo.findOne({ 
+      const booking = await this.bookingRepo.findOne({
         where: { id },
-        relations: ['parkingSpot'],
+        relations: ["parkingSpot"],
       });
 
       if (!booking) {
@@ -113,8 +137,13 @@ export class BookingService {
       }
 
       // Validate status transitions
-      if (dto.status && !this.isValidStatusTransition(booking.status, dto.status)) {
-        throw ApiError.badRequest(`Invalid status transition from ${booking.status} to ${dto.status}`);
+      if (
+        dto.status &&
+        !this.isValidStatusTransition(booking.status, dto.status)
+      ) {
+        throw ApiError.badRequest(
+          `Invalid status transition from ${booking.status} to ${dto.status}`
+        );
       }
 
       // Update booking
@@ -122,7 +151,10 @@ export class BookingService {
       await this.bookingRepo.save(booking);
 
       // If booking is cancelled or completed, free up the spot
-      if (dto.status === EBookingStatus.CANCELLED || dto.status === EBookingStatus.COMPLETED) {
+      if (
+        dto.status === EBookingStatus.CANCELLED ||
+        dto.status === EBookingStatus.COMPLETED
+      ) {
         booking.parkingSpot.isOccupied = false;
         await this.spotRepo.save(booking.parkingSpot);
       }
@@ -141,9 +173,9 @@ export class BookingService {
 
   public async deleteBooking(id: string): Promise<ApiResponse> {
     try {
-      const booking = await this.bookingRepo.findOne({ 
+      const booking = await this.bookingRepo.findOne({
         where: { id },
-        relations: ['parkingSpot'],
+        relations: ["parkingSpot"],
       });
 
       if (!booking) {
@@ -167,10 +199,19 @@ export class BookingService {
     }
   }
 
-  private isValidStatusTransition(currentStatus: EBookingStatus, newStatus: EBookingStatus): boolean {
+  private isValidStatusTransition(
+    currentStatus: EBookingStatus,
+    newStatus: EBookingStatus
+  ): boolean {
     const validTransitions: Record<EBookingStatus, EBookingStatus[]> = {
-      [EBookingStatus.PENDING]: [EBookingStatus.APPROVED, EBookingStatus.CANCELLED],
-      [EBookingStatus.APPROVED]: [EBookingStatus.ACTIVE, EBookingStatus.CANCELLED],
+      [EBookingStatus.PENDING]: [
+        EBookingStatus.APPROVED,
+        EBookingStatus.CANCELLED,
+      ],
+      [EBookingStatus.APPROVED]: [
+        EBookingStatus.ACTIVE,
+        EBookingStatus.CANCELLED,
+      ],
       [EBookingStatus.ACTIVE]: [EBookingStatus.COMPLETED],
       [EBookingStatus.COMPLETED]: [],
       [EBookingStatus.CANCELLED]: [],

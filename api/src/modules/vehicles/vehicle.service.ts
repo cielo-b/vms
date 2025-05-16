@@ -5,7 +5,7 @@ import { AppDataSource } from "../../config/data-source";
 import { ApiError } from "../../errors/api-error";
 import { User } from "../../modals/user.entity";
 import { CreateVehicleDto } from "./dto/create-vehicle.dto";
-import { UpdateVehicleDto } from "./update-vehicle.dto";
+import { UpdateVehicleDto } from "./dto/update-vehicle.dto";
 
 export class VehicleService {
   private vehicleRepo: Repository<Vehicle> =
@@ -30,7 +30,7 @@ export class VehicleService {
       // Check for duplicate license plate for this user
       const existingVehicle = await this.vehicleRepo.findOne({
         where: {
-          licensePlate: dto.licensePlate,
+          licensePlate: dto.plateNumber,
           owner: { id: (req as any).user.id },
         },
       });
@@ -40,7 +40,7 @@ export class VehicleService {
       }
 
       const vehicle = this.vehicleRepo.create({
-        licensePlate: dto.licensePlate,
+        licensePlate: dto.plateNumber,
         owner,
       });
 
@@ -142,10 +142,10 @@ export class VehicleService {
       }
 
       // Check for duplicate license plate
-      if (dto.licensePlate && dto.licensePlate !== vehicle.licensePlate) {
+      if (dto.plateNumber && dto.plateNumber !== vehicle.licensePlate) {
         const existingVehicle = await this.vehicleRepo.findOne({
           where: {
-            licensePlate: dto.licensePlate,
+            licensePlate: dto.plateNumber,
             owner: { id: (req as any).user.id },
           },
         });
@@ -157,7 +157,9 @@ export class VehicleService {
         }
       }
 
-      this.vehicleRepo.merge(vehicle, dto);
+      if (dto.plateNumber) {
+        vehicle.licensePlate = dto.plateNumber;
+      }
       await this.vehicleRepo.save(vehicle);
 
       return {

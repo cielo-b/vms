@@ -52,7 +52,20 @@ export class BookingController extends Controller {
     return response;
   }
 
-  @Get("/:id")
+  @Get("/mine")
+  @Security("bearerAuth", ["CUSTOMER"])
+  @Response<ApiResponse>("200", "List of my bookings")
+  @Response<ApiResponse>("401", "Unauthorized")
+  @Response<ApiResponse>("403", "Forbidden - Customer access required")
+  public async getMyBookings(
+    @Request() req: Express.Request
+  ): Promise<ApiResponse> {
+    const response = await this.bookingService.getMyBookings(req);
+    this.setStatus(200);
+    return response;
+  }
+
+  @Get("/by-id/:id")
   @Security("bearerAuth")
   @Response<ApiResponse>("200", "Booking details")
   @Response<ApiResponse>("401", "Unauthorized")

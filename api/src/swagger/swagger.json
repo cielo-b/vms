@@ -40,19 +40,19 @@
 			},
 			"CreateVehicleDto": {
 				"properties": {
-					"licensePlate": {
+					"plateNumber": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"licensePlate"
+					"plateNumber"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
 			"UpdateVehicleDto": {
 				"properties": {
-					"licensePlate": {
+					"plateNumber": {
 						"type": "string"
 					}
 				},
@@ -930,7 +930,7 @@
 				}
 			}
 		},
-		"/receipt/{id}": {
+		"/receipt/by-id/{id}": {
 			"get": {
 				"operationId": "GetReceiptById",
 				"responses": {
@@ -1017,6 +1017,44 @@
 					{
 						"bearerAuth": [
 							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/receipt": {
+			"get": {
+				"operationId": "GetAllReceipts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Receipt"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"ADMIN"
 						]
 					}
 				],
@@ -2240,7 +2278,55 @@
 				"parameters": []
 			}
 		},
-		"/booking/{id}": {
+		"/booking/mine": {
+			"get": {
+				"operationId": "GetMyBookings",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden - Customer access required",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ApiResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Booking"
+				],
+				"security": [
+					{
+						"bearerAuth": [
+							"CUSTOMER"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/booking/by-id/{id}": {
 			"get": {
 				"operationId": "GetBookingById",
 				"responses": {
@@ -2303,7 +2389,9 @@
 						}
 					}
 				]
-			},
+			}
+		},
+		"/booking/{id}": {
 			"put": {
 				"operationId": "UpdateBooking",
 				"responses": {

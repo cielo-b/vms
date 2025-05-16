@@ -49,4 +49,22 @@ export class ReceiptService {
       throw error instanceof ApiError ? error : ApiError.internal();
     }
   }
+
+  public async getAllReceipts(): Promise<ApiResponse> {
+    try {
+      const receipts = await this.receiptRepo.find({
+        relations: ["booking", "payment"],
+      });
+
+      return {
+        success: true,
+        message: "User receipts retrieved successfully",
+        data: receipts,
+        code: 200,
+      };
+    } catch (error) {
+      console.error("Error getting user receipts:", error);
+      throw error instanceof ApiError ? error : ApiError.internal();
+    }
+  }
 }

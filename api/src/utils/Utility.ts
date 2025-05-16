@@ -18,6 +18,7 @@ export class Utility {
       id: user.id,
       email: user.email,
       role: user.role,
+      name: user.name,
     };
 
     return jwt.sign(payload, secretKey, { expiresIn: "1h" });

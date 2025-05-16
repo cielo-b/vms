@@ -15,7 +15,7 @@ import { ReceiptService } from "./receipt.service";
 export class ReceiptController extends Controller {
   private service: ReceiptService = new ReceiptService();
 
-  @Get("/:id")
+  @Get("/by-id/:id")
   @Security("bearerAuth")
   @Response<ApiResponse>("200", "Receipt details retrieved")
   @Response<ApiResponse>("401", "Unauthorized")
@@ -34,6 +34,18 @@ export class ReceiptController extends Controller {
     @Request() req: Express.Request
   ): Promise<ApiResponse> {
     const response = await this.service.getReceiptsByUser((req as any).user.id);
+    this.setStatus(response.code);
+    return response;
+  }
+
+   @Get("/")
+  @Security("bearerAuth", ["ADMIN"])
+  @Response<ApiResponse>("200", "All receipts retrieved")
+  @Response<ApiResponse>("401", "Unauthorized")
+  public async getAllReceipts(
+    @Request() req: Express.Request
+  ): Promise<ApiResponse> {
+    const response = await this.service.getAllReceipts();
     this.setStatus(response.code);
     return response;
   }
